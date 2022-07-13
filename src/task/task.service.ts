@@ -1,6 +1,6 @@
 import { CreateTaskDto } from './create-task.dto';
 import { ITask } from './task.interface';
-import { HttpException, HttpStatus, Injectable, NotFoundException } from "@nestjs/common";
+import { HttpException, HttpStatus, Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { Task } from './task.entity';
 import { NotFoundTaskException } from './exceptions/not-found-exception.exception';
 
@@ -12,8 +12,8 @@ export class TaskService {
         return this.tasks;
     }
 
-    getTaskById(taskId: string): ITask {
-        const task = this.tasks.find((t) => t.id === +taskId);
+    getTaskById(taskId: number): ITask {
+        const task = this.tasks.find((t) => t.id === taskId);
         if (!task) {
             // throw new HttpException('task was not found', 404);
             // throw new HttpException('task was not found', HttpStatus.NOT_FOUND);
@@ -24,9 +24,17 @@ export class TaskService {
         return task;
     }
 
-    createTask({ task, tags, status }: CreateTaskDto): ITask {
-        const newTask = new Task(task, tags, status);
+    createTask({ task, tags, status, email }: CreateTaskDto): ITask {
+        const newTask = new Task(task, tags, status, email);
         this.tasks.push(newTask);
         return newTask;
+    }
+
+    getTaskByEmail(email: string): ITask[] {
+        const tasksArray = this.tasks.filter(task => task.email === email);
+        if (!tasksArray || tasksArray.length === 0) {
+            throw new BadRequestException('tasks was not found');
+        };
+        return tasksArray;
     }
 }
