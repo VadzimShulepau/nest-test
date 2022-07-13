@@ -7,7 +7,7 @@ export class CreateTaskDto {
   task: string;
 
   @IsOptional()
-  @ArrayNotEmpty({message:'should be tags'})
+  @ArrayNotEmpty({ message: 'should be tags' })
   @IsString({ each: true, message: 'tags should be lowercase' })
   tags?: string[];
 

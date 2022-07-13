@@ -1,7 +1,8 @@
 import { CreateTaskDto } from './create-task.dto';
 import { ITask } from './task.interface';
-import { Injectable } from "@nestjs/common";
+import { HttpException, HttpStatus, Injectable, NotFoundException } from "@nestjs/common";
 import { Task } from './task.entity';
+import { NotFoundTaskException } from './exceptions/not-found-exception.exception';
 
 @Injectable()
 export class TaskService {
@@ -12,7 +13,15 @@ export class TaskService {
     }
 
     getTaskById(taskId: string): ITask {
-        return this.tasks.find((t) => t.id === +taskId);
+        const task = this.tasks.find((t) => t.id === +taskId);
+        if (!task) {
+            // throw new HttpException('task was not found', 404);
+            // throw new HttpException('task was not found', HttpStatus.NOT_FOUND);
+            // throw new NotFoundException({ message: 'task was not found', error: 'task was not found' });
+            throw new NotFoundTaskException();
+        };
+
+        return task;
     }
 
     createTask({ task, tags, status }: CreateTaskDto): ITask {
